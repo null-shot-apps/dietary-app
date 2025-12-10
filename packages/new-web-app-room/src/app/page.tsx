@@ -2,6 +2,18 @@
 
 import { useState } from 'react';
 
+interface FoodEntry {
+  id: string;
+  name: string;
+  description: string;
+  date: string;
+  mealCategory: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+}
+
 export default function Dashboard() {
   // Daily goals
   const dailyCalorieGoal = 2000;
@@ -9,11 +21,27 @@ export default function Dashboard() {
   const dailyCarbsGoal = 200; // grams
   const dailyFatsGoal = 65; // grams
 
-  // Current intake (example data - will be dynamic later)
-  const [currentCalories, setCurrentCalories] = useState(1250);
-  const [currentProtein, setCurrentProtein] = useState(85);
-  const [currentCarbs, setCurrentCarbs] = useState(120);
-  const [currentFats, setCurrentFats] = useState(42);
+  // Food entries
+  const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
+  
+  // Form state
+  const [foodName, setFoodName] = useState('');
+  const [foodDescription, setFoodDescription] = useState('');
+  const [foodDate, setFoodDate] = useState(new Date().toISOString().split('T')[0]);
+  const [mealCategory, setMealCategory] = useState<'breakfast' | 'lunch' | 'dinner' | 'snack'>('breakfast');
+  const [foodCalories, setFoodCalories] = useState('');
+  const [foodProtein, setFoodProtein] = useState('');
+  const [foodCarbs, setFoodCarbs] = useState('');
+  const [foodFats, setFoodFats] = useState('');
+
+  // Calculate current totals from food entries for today
+  const today = new Date().toISOString().split('T')[0];
+  const todayEntries = foodEntries.filter(entry => entry.date === today);
+  
+  const currentCalories = todayEntries.reduce((sum, entry) => sum + entry.calories, 0);
+  const currentProtein = todayEntries.reduce((sum, entry) => sum + entry.protein, 0);
+  const currentCarbs = todayEntries.reduce((sum, entry) => sum + entry.carbs, 0);
+  const currentFats = todayEntries.reduce((sum, entry) => sum + entry.fats, 0);
 
   // Calculate remaining and percentages
   const remainingCalories = dailyCalorieGoal - currentCalories;
@@ -21,6 +49,35 @@ export default function Dashboard() {
   const carbsPercent = (currentCarbs / dailyCarbsGoal) * 100;
   const fatsPercent = (currentFats / dailyFatsGoal) * 100;
   const caloriesPercent = (currentCalories / dailyCalorieGoal) * 100;
+
+  // Handle form submission
+  const handleAddFood = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const newEntry: FoodEntry = {
+      id: Date.now().toString(),
+      name: foodName,
+      description: foodDescription,
+      date: foodDate,
+      mealCategory: mealCategory,
+      calories: parseFloat(foodCalories) || 0,
+      protein: parseFloat(foodProtein) || 0,
+      carbs: parseFloat(foodCarbs) || 0,
+      fats: parseFloat(foodFats) || 0,
+    };
+    
+    setFoodEntries([...foodEntries, newEntry]);
+    
+    // Reset form
+    setFoodName('');
+    setFoodDescription('');
+    setFoodDate(new Date().toISOString().split('T')[0]);
+    setMealCategory('breakfast');
+    setFoodCalories('');
+    setFoodProtein('');
+    setFoodCarbs('');
+    setFoodFats('');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
@@ -122,8 +179,176 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Add Food Form */}
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mt-6 border border-white/20">
+          <h2 className="text-2xl font-bold mb-6">Log Food Intake</h2>
+          
+          <form onSubmit={handleAddFood} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Food Name */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Food Name</label>
+                <input
+                  type="text"
+                  value={foodName}
+                  onChange={(e) => setFoodName(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="e.g., Grilled Chicken"
+                  required
+                />
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Date</label>
+                <input
+                  type="date"
+                  value={foodDate}
+                  onChange={(e) => setFoodDate(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Meal Category */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Meal Category</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {(['breakfast', 'lunch', 'dinner', 'snack'] as const).map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setMealCategory(category)}
+                    className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                      mealCategory === category
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/5 border border-white/20 hover:bg-white/10'
+                    }`}
+                  >
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium mb-2">Description</label>
+              <textarea
+                value={foodDescription}
+                onChange={(e) => setFoodDescription(e.target.value)}
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                placeholder="Add notes about your meal..."
+                rows={3}
+              />
+            </div>
+
+            {/* Nutrition Info */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Calories</label>
+                <input
+                  type="number"
+                  value={foodCalories}
+                  onChange={(e) => setFoodCalories(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="0"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Protein (g)</label>
+                <input
+                  type="number"
+                  value={foodProtein}
+                  onChange={(e) => setFoodProtein(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="0"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Carbs (g)</label>
+                <input
+                  type="number"
+                  value={foodCarbs}
+                  onChange={(e) => setFoodCarbs(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="0"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Fats (g)</label>
+                <input
+                  type="number"
+                  value={foodFats}
+                  onChange={(e) => setFoodFats(e.target.value)}
+                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="0"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg transition-all"
+            >
+              Add Food Entry
+            </button>
+          </form>
+        </div>
+
+        {/* Food Entries List */}
+        {todayEntries.length > 0 && (
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mt-6 border border-white/20">
+            <h2 className="text-2xl font-bold mb-6">Today's Meals</h2>
+            
+            <div className="space-y-4">
+              {todayEntries.map((entry) => (
+                <div key={entry.id} className="bg-white/5 rounded-lg p-4 border border-white/10">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-semibold text-lg">{entry.name}</h3>
+                      <span className="text-xs text-purple-400 uppercase tracking-wide">
+                        {entry.mealCategory}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-green-400">{entry.calories}</div>
+                      <div className="text-xs text-slate-400">calories</div>
+                    </div>
+                  </div>
+                  
+                  {entry.description && (
+                    <p className="text-sm text-slate-300 mb-3">{entry.description}</p>
+                  )}
+                  
+                  <div className="flex gap-4 text-sm">
+                    <span className="text-blue-400">Protein: {entry.protein}g</span>
+                    <span className="text-yellow-400">Carbs: {entry.carbs}g</span>
+                    <span className="text-pink-400">Fats: {entry.fats}g</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+
+
+
+
+
 
