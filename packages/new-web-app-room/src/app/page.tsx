@@ -339,7 +339,7 @@ export default function Dashboard() {
         {/* Food Entries List */}
         {todayEntries.length > 0 && (
           <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mt-6 border border-white/20">
-            <h2 className="text-2xl font-bold mb-6">Today's Meals</h2>
+            <h2 className="text-2xl font-bold mb-6">Today&apos;s Meals</h2>
             
             <div className="space-y-4">
               {todayEntries.map((entry) => (
@@ -446,6 +446,7 @@ export default function Dashboard() {
     </div>
   );
 }
+
 
 
 
