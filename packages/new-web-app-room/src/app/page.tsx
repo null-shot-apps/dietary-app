@@ -15,11 +15,14 @@ interface FoodEntry {
 }
 
 export default function Dashboard() {
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'goals'>('dashboard');
+
   // Daily goals
-  const dailyCalorieGoal = 2000;
-  const dailyProteinGoal = 150; // grams
-  const dailyCarbsGoal = 200; // grams
-  const dailyFatsGoal = 65; // grams
+  const [dailyCalorieGoal, setDailyCalorieGoal] = useState(2000);
+  const [dailyProteinGoal, setDailyProteinGoal] = useState(150); // grams
+  const [dailyCarbsGoal, setDailyCarbsGoal] = useState(200); // grams
+  const [dailyFatsGoal, setDailyFatsGoal] = useState(65); // grams
 
   // Food entries
   const [foodEntries, setFoodEntries] = useState<FoodEntry[]>([]);
@@ -88,6 +91,33 @@ export default function Dashboard() {
           <p className="text-slate-300">Track your daily calories and macros</p>
         </header>
 
+        {/* Tab Navigation */}
+        <div className="flex gap-2 mb-6">
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              activeTab === 'dashboard'
+                ? 'bg-purple-600 text-white'
+                : 'bg-white/10 text-slate-300 hover:bg-white/20'
+            }`}
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab('goals')}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all ${
+              activeTab === 'goals'
+                ? 'bg-purple-600 text-white'
+                : 'bg-white/10 text-slate-300 hover:bg-white/20'
+            }`}
+          >
+            Goals
+          </button>
+        </div>
+
+        {/* Dashboard Tab Content */}
+        {activeTab === 'dashboard' && (
+          <>
         {/* Main Calorie Card */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 border border-white/20">
           <div className="text-center mb-6">
@@ -341,10 +371,85 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+          </>
+        )}
+
+        {/* Goals Tab Content */}
+        {activeTab === 'goals' && (
+          <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
+            <h2 className="text-2xl font-bold mb-6">Set Your Daily Goals</h2>
+            
+            <div className="space-y-6">
+              {/* Calorie Goal */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Daily Calorie Goal</label>
+                <input
+                  type="number"
+                  value={dailyCalorieGoal}
+                  onChange={(e) => setDailyCalorieGoal(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
+                  placeholder="2000"
+                />
+                <p className="text-sm text-slate-400 mt-1">Recommended: 1800-2500 calories/day</p>
+              </div>
+
+              {/* Protein Goal */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Daily Protein Goal (grams)</label>
+                <input
+                  type="number"
+                  value={dailyProteinGoal}
+                  onChange={(e) => setDailyProteinGoal(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
+                  placeholder="150"
+                />
+                <p className="text-sm text-slate-400 mt-1">Recommended: 0.8-1.2g per kg of body weight</p>
+              </div>
+
+              {/* Carbs Goal */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Daily Carbs Goal (grams)</label>
+                <input
+                  type="number"
+                  value={dailyCarbsGoal}
+                  onChange={(e) => setDailyCarbsGoal(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
+                  placeholder="200"
+                />
+                <p className="text-sm text-slate-400 mt-1">Recommended: 45-65% of total calories</p>
+              </div>
+
+              {/* Fats Goal */}
+              <div>
+                <label className="block text-sm font-medium mb-2">Daily Fats Goal (grams)</label>
+                <input
+                  type="number"
+                  value={dailyFatsGoal}
+                  onChange={(e) => setDailyFatsGoal(parseInt(e.target.value) || 0)}
+                  className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
+                  placeholder="65"
+                />
+                <p className="text-sm text-slate-400 mt-1">Recommended: 20-35% of total calories</p>
+              </div>
+
+              {/* Save Button */}
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg transition-all"
+              >
+                Save Goals & Return to Dashboard
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
+
+
+
+
 
 
 
