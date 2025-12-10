@@ -1,84 +1,129 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-const slogans = [
-  "Turn chats into apps",
-  "Prompt. Ship. Repeat.",
-  "Build anything from a chat",
-  "Ideas → Apps, instantly",
-  "From zero to MVP in minutes",
-  "Your cofounder in the command line",
-  "Draft, iterate, deploy",
-  "Ship faster than you can type",
-  "Design in text, deliver in code",
-  "Dream it. Prompt it. Run it.",
-  "Chat-native app building",
-  "From prompt to product",
-  "One prompt, infinite apps",
-  "Stop scaffolding. Start shipping.",
-  "Prototype at the speed of thought",
-  "Make conversations executable"
-];
+export default function Dashboard() {
+  // Daily goals
+  const dailyCalorieGoal = 2000;
+  const dailyProteinGoal = 150; // grams
+  const dailyCarbsGoal = 200; // grams
+  const dailyFatsGoal = 65; // grams
 
-export default function Landing() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+  // Current intake (example data - will be dynamic later)
+  const [currentCalories, setCurrentCalories] = useState(1250);
+  const [currentProtein, setCurrentProtein] = useState(85);
+  const [currentCarbs, setCurrentCarbs] = useState(120);
+  const [currentFats, setCurrentFats] = useState(42);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % slogans.length);
-        setIsVisible(true);
-      }, 400);
-    }, 2800);
-
-    return () => clearInterval(interval);
-  }, []);
+  // Calculate remaining and percentages
+  const remainingCalories = dailyCalorieGoal - currentCalories;
+  const proteinPercent = (currentProtein / dailyProteinGoal) * 100;
+  const carbsPercent = (currentCarbs / dailyCarbsGoal) * 100;
+  const fatsPercent = (currentFats / dailyFatsGoal) * 100;
+  const caloriesPercent = (currentCalories / dailyCalorieGoal) * 100;
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-black text-white">
-      {/* Enhanced animated aurora background layers */}
-      <div className="absolute inset-0 bg-aurora-layer-1" />
-      <div className="absolute inset-0 bg-aurora-layer-2" />
-      <div className="absolute inset-0 bg-aurora-layer-3" />
-      
-      {/* Floating particles overlay */}
-      <div className="absolute inset-0 bg-particles" />
-      
-      {/* Main content - centered */}
-      <main className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-        <h1 className="text-center text-[clamp(28px,6vw,64px)] font-medium tracking-tight mb-4">
-          Turn Chats into Apps
-        </h1>
-        
-        {/* Rotating slogans */}
-        <div className="mt-4 h-8 md:h-10 overflow-hidden flex items-center justify-center">
-          <span
-            className={`inline-block text-center text-[clamp(18px,3vw,32px)] font-light transition-all duration-[400ms] ease-in-out ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-            }`}
-          >
-            {slogans[currentIndex]}
-          </span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <header className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">Nutrition Dashboard</h1>
+          <p className="text-slate-300">Track your daily calories and macros</p>
+        </header>
+
+        {/* Main Calorie Card */}
+        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 mb-6 border border-white/20">
+          <div className="text-center mb-6">
+            <div className="text-6xl font-bold mb-2">{currentCalories}</div>
+            <div className="text-xl text-slate-300">calories consumed</div>
+          </div>
+          
+          {/* Calorie Progress Bar */}
+          <div className="relative w-full h-4 bg-slate-700 rounded-full overflow-hidden mb-4">
+            <div 
+              className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500"
+              style={{ width: `${Math.min(caloriesPercent, 100)}%` }}
+            />
+          </div>
+          
+          <div className="flex justify-between text-lg">
+            <span className="text-slate-300">Remaining</span>
+            <span className={`font-semibold ${remainingCalories >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+              {remainingCalories >= 0 ? remainingCalories : 0} cal
+            </span>
+          </div>
+          <div className="text-center text-sm text-slate-400 mt-2">
+            Goal: {dailyCalorieGoal} cal/day
+          </div>
         </div>
-      </main>
-      
-      {/* Start Prompting arrow pointing left - bottom left */}
-      <div className="absolute left-6 md:left-8 bottom-[5%] z-20 flex items-center gap-3 arrow-point-left">
-        <div className="flex items-center gap-2 text-white/80 font-medium text-sm md:text-base">
-          <svg 
-            className="w-5 h-5 md:w-6 md:h-6 animate-bounce-horizontal" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Start prompting</span>
+
+        {/* Macros Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Protein Card */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Protein</h3>
+              <span className="text-2xl">🥩</span>
+            </div>
+            <div className="text-3xl font-bold mb-2">{currentProtein}g</div>
+            <div className="text-sm text-slate-300 mb-3">of {dailyProteinGoal}g</div>
+            
+            {/* Progress Circle */}
+            <div className="relative w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-400 to-blue-600 transition-all duration-500"
+                style={{ width: `${Math.min(proteinPercent, 100)}%` }}
+              />
+            </div>
+            <div className="text-right text-xs text-slate-400 mt-1">
+              {Math.round(proteinPercent)}%
+            </div>
+          </div>
+
+          {/* Carbs Card */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Carbs</h3>
+              <span className="text-2xl">🍞</span>
+            </div>
+            <div className="text-3xl font-bold mb-2">{currentCarbs}g</div>
+            <div className="text-sm text-slate-300 mb-3">of {dailyCarbsGoal}g</div>
+            
+            {/* Progress Circle */}
+            <div className="relative w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500"
+                style={{ width: `${Math.min(carbsPercent, 100)}%` }}
+              />
+            </div>
+            <div className="text-right text-xs text-slate-400 mt-1">
+              {Math.round(carbsPercent)}%
+            </div>
+          </div>
+
+          {/* Fats Card */}
+          <div className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Fats</h3>
+              <span className="text-2xl">🥑</span>
+            </div>
+            <div className="text-3xl font-bold mb-2">{currentFats}g</div>
+            <div className="text-sm text-slate-300 mb-3">of {dailyFatsGoal}g</div>
+            
+            {/* Progress Circle */}
+            <div className="relative w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-pink-400 to-rose-500 transition-all duration-500"
+                style={{ width: `${Math.min(fatsPercent, 100)}%` }}
+              />
+            </div>
+            <div className="text-right text-xs text-slate-400 mt-1">
+              {Math.round(fatsPercent)}%
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
